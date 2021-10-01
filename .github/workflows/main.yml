@@ -6,6 +6,8 @@ jobs:
     name: Clean 2 Sandboxes
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Hello world action step
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
