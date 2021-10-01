@@ -1,0 +1,17 @@
+on: [push,workflow_dispatch]
+
+jobs:
+  veracode-sandbox-task:
+    runs-on: ubuntu-latest
+    name: Clean 2 Sandboxes
+
+    steps:
+      - name: Hello world action step
+        env:
+          VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
+          VERACODE_API_SECRET: '${{ secrets.VERACODE_API_KEY }}'
+        uses: ./
+        with:
+          activity: 'clean'
+          app-name: 'My Application'
+          clean-amount: '2' # (Optional) Number - with default as 1
