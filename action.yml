@@ -1,0 +1,21 @@
+# action.yml
+name: 'Veracode Application Sandboxes Helper'
+description: 'A set of actions and activities to manage sandboxes in the context of a workflow processes'
+inputs:
+  activity:
+    description: "The activity expected from the Action: clean, promote-latest-scan, promote-and-remove, remove-sandbox"
+    required: false
+  app-name:  # id of input
+    description: 'Veracode Application name'
+    required: true
+  sandbox-name:  # id of input
+    description: 'Sandbox name for actions related to a specific Sandbox'
+    required: false
+  clean-amount:
+    description: 'The amount of oldest scanned-in sandboxes to remove'
+    required: false
+    default: "1"
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+

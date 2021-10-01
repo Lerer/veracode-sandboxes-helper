@@ -1,0 +1,34 @@
+{
+  "name": "veracode-sandboxes-helper",
+  "version": "1.0.0",
+  "description": "An Action to handle Sandboxes such as, deleting, promoting scans, and with combination",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf ./dist/",
+    "build": "npm run clean && ncc build ./src/action.ts --license license"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lerer/veracode-sandboxes-helper.git"
+  },
+  "keywords": [
+    "Veracode",
+    "SAST",
+    "AST",
+    "Other"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Lerer/veracode-sandboxes-helper/issues"
+  },
+  "homepage": "https://github.com/Lerer/veracode-sandboxes-helper#readme",
+  "devDependencies": {
+    "@types/node": "^16.10.2",
+    "@vercel/ncc": "^0.31.1"
+  },
+  "dependencies": {
+    "@actions/core": "^1.6.0"
+  }
+}
