@@ -23,8 +23,20 @@ export function run(opt: Options, msgFunc: (msg: string) => void) {
     }
 }
 
-const promoteScan = (appName: string,sandboxName: string,deleteOnPromote:boolean, msgFunc: (msg: string) => void)  => {
+const promoteScan = async (appName: string,sandboxName: string,deleteOnPromote:boolean, msgFunc: (msg: string) => void)  => {
     msgFunc(`got Promote of sandbox ${sandboxName} call`);
+    try {
+        const apiWrapper = new SandboxAPIProcessor();
+        if (apiWrapper) {
+            const sandbox = await apiWrapper.promoteApplicationSandbox(appName,sandboxName,deleteOnPromote);
+            msgFunc(`Sandbox promoted`);
+            msgFunc(`${sandbox}`);
+        }
+    } catch (error) {
+        console.log(error);
+        core.setFailed(error as Error);
+    }
+    msgFunc('Finish call');
 }
 
 const removeSandbox = async (appName: string,sandboxName: string, msgFunc: (msg: string) => void) => {
@@ -32,8 +44,9 @@ const removeSandbox = async (appName: string,sandboxName: string, msgFunc: (msg:
     try {
         const apiWrapper = new SandboxAPIProcessor();
         if (apiWrapper) {
-            const sandboxesCound = await apiWrapper.getApplicationSandboxCount(appName);
-            msgFunc(`found ${sandboxesCound} sandboxes`);
+            const sandbox = await apiWrapper.deleteApplicationSandbox(appName,sandboxName);
+            msgFunc(`Sandbox removed`);
+            msgFunc(`${sandbox}`);
         }
     } catch (error) {
         console.log(error);

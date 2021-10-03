@@ -1,6 +1,6 @@
 import axios , {AxiosResponse} from "axios";
 import { generateHeader, getHost } from "./auth";
-import { VeracodeApplicationResponseData, VeracodeSandboxesResponseData } from "./VeracodeResponse";
+import { VeracodeApplicationResponseData, VeracodeSandboxData, VeracodeSandboxesResponseData } from "./VeracodeResponse";
 import * as core from '@actions/core'
 
 export class SandboxAPIProcessor {
@@ -80,16 +80,40 @@ export class SandboxAPIProcessor {
                 },
             });
 
-            let sandboxes: VeracodeSandboxesResponseData=sandboxesResponse.data;
-            if (sandboxes._embedded.sandboxes){
-                return sandboxes._embedded.sandboxes;
+            let sandbox: VeracodeSandboxData=sandboxesResponse.data;
+            if (sandbox.id){
+                return sandbox;
             }
         }
         catch (e) {
             console.log(e);
             core.setFailed(e as Error);
         }
-        return [];
+    }
+
+    private async promoteApplicationSandboxesAPI(sandboxGUID:string, deleteOnPromote:boolean) {
+        let path= `/appsec/v1/applications/${this.appGUID}/sandboxes/${sandboxGUID}/promote`;
+
+        if (deleteOnPromote) {
+            path = path + '?delete_on_promote=true';
+        }
+        
+        try {
+            const sandboxesResponse: AxiosResponse = await axios.post(`https://${getHost()}${path}`,{
+                headers:{
+                    'Authorization': generateHeader(path, 'POST',this.apiKey!,this.apiSecret!),
+                },
+            });
+
+            let sandbox: VeracodeSandboxData=sandboxesResponse.data;
+            if (sandbox.id){
+                return sandbox;
+            }
+        }
+        catch (e) {
+            console.log(e);
+            core.setFailed(e as Error);
+        }
     }
 
     private async getApplicationSandboxes(appName:string) {
@@ -100,6 +124,19 @@ export class SandboxAPIProcessor {
         return this.getApplicationSandboxesAPI();
     }
 
+    private async findSpecificSandbox(appName: string,sandboxName: string) {
+        const sandboxes =  await this.getApplicationSandboxes(appName);
+
+        const neededSandbox = sandboxes.filter((sandbox) => {
+            return sandbox.name===sandboxName;
+        });
+
+        if (neededSandbox.length>0) {
+            return neededSandbox[0];
+        }
+    }
+
+
     public async getApplicationSandboxCount(appName: string) {
         
         const sandboxes = await this.getApplicationSandboxes(appName);
@@ -108,14 +145,19 @@ export class SandboxAPIProcessor {
     }
 
     public async deleteApplicationSandbox(appName: string,sandboxName:string) {
-        const sandboxes = await this.getApplicationSandboxes(appName);
 
-        const neededSandbox = sandboxes.filter((sandbox) => {
-            return sandbox.name===sandboxName;
-        });
+        const neededSandbox = await this.findSpecificSandbox(appName,sandboxName);
 
-        if (neededSandbox.length>0) {
-            await this.deleteApplicationSandboxesAPI(neededSandbox[0].guid);
+        if (neededSandbox) {
+            return this.deleteApplicationSandboxesAPI(neededSandbox.guid);
+        }
+    }
+
+    public async promoteApplicationSandbox(appName: string,sandboxName:string,deleteOnPromote:boolean) {
+        const sandbox = await this.findSpecificSandbox(appName,sandboxName);
+
+        if (sandbox) {
+            return this.promoteApplicationSandboxesAPI(sandbox.guid,deleteOnPromote);
         }
     }
 }

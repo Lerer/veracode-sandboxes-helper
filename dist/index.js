@@ -4710,16 +4710,38 @@ class SandboxAPIProcessor {
                         'Authorization': (0, auth_1.generateHeader)(path, 'DELETE', this.apiKey, this.apiSecret),
                     },
                 });
-                let sandboxes = sandboxesResponse.data;
-                if (sandboxes._embedded.sandboxes) {
-                    return sandboxes._embedded.sandboxes;
+                let sandbox = sandboxesResponse.data;
+                if (sandbox.id) {
+                    return sandbox;
                 }
             }
             catch (e) {
                 console.log(e);
                 core.setFailed(e);
             }
-            return [];
+        });
+    }
+    promoteApplicationSandboxesAPI(sandboxGUID, deleteOnPromote) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let path = `/appsec/v1/applications/${this.appGUID}/sandboxes/${sandboxGUID}/promote`;
+            if (deleteOnPromote) {
+                path = path + '?delete_on_promote=true';
+            }
+            try {
+                const sandboxesResponse = yield axios_1.default.post(`https://${(0, auth_1.getHost)()}${path}`, {
+                    headers: {
+                        'Authorization': (0, auth_1.generateHeader)(path, 'POST', this.apiKey, this.apiSecret),
+                    },
+                });
+                let sandbox = sandboxesResponse.data;
+                if (sandbox.id) {
+                    return sandbox;
+                }
+            }
+            catch (e) {
+                console.log(e);
+                core.setFailed(e);
+            }
         });
     }
     getApplicationSandboxes(appName) {
@@ -4731,6 +4753,17 @@ class SandboxAPIProcessor {
             return this.getApplicationSandboxesAPI();
         });
     }
+    findSpecificSandbox(appName, sandboxName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sandboxes = yield this.getApplicationSandboxes(appName);
+            const neededSandbox = sandboxes.filter((sandbox) => {
+                return sandbox.name === sandboxName;
+            });
+            if (neededSandbox.length > 0) {
+                return neededSandbox[0];
+            }
+        });
+    }
     getApplicationSandboxCount(appName) {
         return __awaiter(this, void 0, void 0, function* () {
             const sandboxes = yield this.getApplicationSandboxes(appName);
@@ -4739,12 +4772,17 @@ class SandboxAPIProcessor {
     }
     deleteApplicationSandbox(appName, sandboxName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sandboxes = yield this.getApplicationSandboxes(appName);
-            const neededSandbox = sandboxes.filter((sandbox) => {
-                return sandbox.name === sandboxName;
-            });
-            if (neededSandbox.length > 0) {
-                yield this.deleteApplicationSandboxesAPI(neededSandbox[0].guid);
+            const neededSandbox = yield this.findSpecificSandbox(appName, sandboxName);
+            if (neededSandbox) {
+                return this.deleteApplicationSandboxesAPI(neededSandbox.guid);
+            }
+        });
+    }
+    promoteApplicationSandbox(appName, sandboxName, deleteOnPromote) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sandbox = yield this.findSpecificSandbox(appName, sandboxName);
+            if (sandbox) {
+                return this.promoteApplicationSandboxesAPI(sandbox.guid, deleteOnPromote);
             }
         });
     }
@@ -4846,16 +4884,30 @@ function run(opt, msgFunc) {
     }
 }
 exports.run = run;
-const promoteScan = (appName, sandboxName, deleteOnPromote, msgFunc) => {
+const promoteScan = (appName, sandboxName, deleteOnPromote, msgFunc) => __awaiter(void 0, void 0, void 0, function* () {
     msgFunc(`got Promote of sandbox ${sandboxName} call`);
-};
+    try {
+        const apiWrapper = new apiProcessor_1.SandboxAPIProcessor();
+        if (apiWrapper) {
+            const sandbox = yield apiWrapper.promoteApplicationSandbox(appName, sandboxName, deleteOnPromote);
+            msgFunc(`Sandbox promoted`);
+            msgFunc(`${sandbox}`);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        core_1.default.setFailed(error);
+    }
+    msgFunc('Finish call');
+});
 const removeSandbox = (appName, sandboxName, msgFunc) => __awaiter(void 0, void 0, void 0, function* () {
     msgFunc(`got remove sandbox call for ${sandboxName}`);
     try {
         const apiWrapper = new apiProcessor_1.SandboxAPIProcessor();
         if (apiWrapper) {
-            const sandboxesCound = yield apiWrapper.getApplicationSandboxCount(appName);
-            msgFunc(`found ${sandboxesCound} sandboxes`);
+            const sandbox = yield apiWrapper.deleteApplicationSandbox(appName, sandboxName);
+            msgFunc(`Sandbox removed`);
+            msgFunc(`${sandbox}`);
         }
     }
     catch (error) {
