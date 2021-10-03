@@ -1,6 +1,6 @@
 import { SandboxAPIProcessor } from "./apiProcessor";
 import { Options } from "./Options";
-
+import core from '@actions/core';
 export function run(opt: Options, msgFunc: (msg: string) => void) {
     const action = opt.activity;
     const appName = opt.appName;
@@ -21,8 +21,6 @@ export function run(opt: Options, msgFunc: (msg: string) => void) {
             promoteScan(appName,sandboxName,false,msgFunc);
             break;
     }
-    
-    msgFunc('file created: ' + 'outputFilename');
 }
 
 const promoteScan = (appName: string,sandboxName: string,deleteOnPromote:boolean, msgFunc: (msg: string) => void)  => {
@@ -31,10 +29,15 @@ const promoteScan = (appName: string,sandboxName: string,deleteOnPromote:boolean
 
 const removeSandbox = async (appName: string,sandboxName: string, msgFunc: (msg: string) => void) => {
     msgFunc(`got remove sandbox call for ${sandboxName}`);
-    const apiWrapper = new SandboxAPIProcessor();
-    if (apiWrapper) {
-        const sandboxesCound = await apiWrapper.getApplicationSandboxCount(appName);
-        msgFunc(`found ${sandboxesCound} sandboxes`);
+    try {
+        const apiWrapper = new SandboxAPIProcessor();
+        if (apiWrapper) {
+            const sandboxesCound = await apiWrapper.getApplicationSandboxCount(appName);
+            msgFunc(`found ${sandboxesCound} sandboxes`);
+        }
+    } catch (error) {
+        console.log(error);
+        core.setFailed(error as Error);
     }
     msgFunc('Finish call');
 }

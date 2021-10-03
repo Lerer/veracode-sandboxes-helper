@@ -4605,6 +4605,25 @@ catch (error) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -4621,6 +4640,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SandboxAPIProcessor = void 0;
 const axios_1 = __importDefault(__nccwpck_require__(6545));
 const auth_1 = __nccwpck_require__(3497);
+const core = __importStar(__nccwpck_require__(2186));
 class SandboxAPIProcessor {
     constructor(apiKey = process.env.VERACODE_API_ID, apiSecret = process.env.VERACODE_API_SECRET) {
         this.apiKey = apiKey;
@@ -4630,7 +4650,7 @@ class SandboxAPIProcessor {
             throw new Error('Make sure VERACODE_API_ID and VERACODE_API_SECRET are pass as environment variables');
         }
     }
-    getAppGUIDbyName(appName) {
+    getAppGUIDbyNameAPI(appName) {
         return __awaiter(this, void 0, void 0, function* () {
             const encodedAppname = encodeURIComponent(appName);
             let path = "/appsec/v1/applications?size=100&page=0&name=" + encodedAppname;
@@ -4654,10 +4674,11 @@ class SandboxAPIProcessor {
             }
             catch (e) {
                 console.log(e);
+                core.setFailed(e);
             }
         });
     }
-    getApplicationSandboxes() {
+    getApplicationSandboxesAPI() {
         return __awaiter(this, void 0, void 0, function* () {
             let path = `/appsec/v1/applications/${this.appGUID}/sandboxes`;
             //send request
@@ -4674,18 +4695,57 @@ class SandboxAPIProcessor {
             }
             catch (e) {
                 console.log(e);
+                core.setFailed(e);
             }
             return [];
         });
     }
-    getApplicationSandboxCount(appName) {
+    deleteApplicationSandboxesAPI(sandboxGUID) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.getAppGUIDbyName(appName);
+            let path = `/appsec/v1/applications/${this.appGUID}/sandboxes/${sandboxGUID}`;
+            //send request
+            try {
+                const sandboxesResponse = yield axios_1.default.delete(`https://${(0, auth_1.getHost)()}${path}`, {
+                    headers: {
+                        'Authorization': (0, auth_1.generateHeader)(path, 'DELETE', this.apiKey, this.apiSecret),
+                    },
+                });
+                let sandboxes = sandboxesResponse.data;
+                if (sandboxes._embedded.sandboxes) {
+                    return sandboxes._embedded.sandboxes;
+                }
+            }
+            catch (e) {
+                console.log(e);
+                core.setFailed(e);
+            }
+            return [];
+        });
+    }
+    getApplicationSandboxes(appName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.getAppGUIDbyNameAPI(appName);
             if (this.appGUID === 0) {
                 throw new Error(`Cannot find application with name ${appName}`);
             }
-            const sandboxes = yield this.getApplicationSandboxes();
+            return this.getApplicationSandboxesAPI();
+        });
+    }
+    getApplicationSandboxCount(appName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sandboxes = yield this.getApplicationSandboxes(appName);
             return sandboxes.length;
+        });
+    }
+    deleteApplicationSandbox(appName, sandboxName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sandboxes = yield this.getApplicationSandboxes(appName);
+            const neededSandbox = sandboxes.filter((sandbox) => {
+                return sandbox.name === sandboxName;
+            });
+            if (neededSandbox.length > 0) {
+                yield this.deleteApplicationSandboxesAPI(neededSandbox[0].guid);
+            }
         });
     }
 }
@@ -4758,9 +4818,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const apiProcessor_1 = __nccwpck_require__(6174);
+const core_1 = __importDefault(__nccwpck_require__(2186));
 function run(opt, msgFunc) {
     const action = opt.activity;
     const appName = opt.appName;
@@ -4780,7 +4844,6 @@ function run(opt, msgFunc) {
             promoteScan(appName, sandboxName, false, msgFunc);
             break;
     }
-    msgFunc('file created: ' + 'outputFilename');
 }
 exports.run = run;
 const promoteScan = (appName, sandboxName, deleteOnPromote, msgFunc) => {
@@ -4788,10 +4851,16 @@ const promoteScan = (appName, sandboxName, deleteOnPromote, msgFunc) => {
 };
 const removeSandbox = (appName, sandboxName, msgFunc) => __awaiter(void 0, void 0, void 0, function* () {
     msgFunc(`got remove sandbox call for ${sandboxName}`);
-    const apiWrapper = new apiProcessor_1.SandboxAPIProcessor();
-    if (apiWrapper) {
-        const sandboxesCound = yield apiWrapper.getApplicationSandboxCount(appName);
-        msgFunc(`found ${sandboxesCound} sandboxes`);
+    try {
+        const apiWrapper = new apiProcessor_1.SandboxAPIProcessor();
+        if (apiWrapper) {
+            const sandboxesCound = yield apiWrapper.getApplicationSandboxCount(appName);
+            msgFunc(`found ${sandboxesCound} sandboxes`);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        core_1.default.setFailed(error);
     }
     msgFunc('Finish call');
 });

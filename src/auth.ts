@@ -31,7 +31,7 @@ export const getHost = () => {
 	return host;
 }
 
-export const generateHeader = (url:string, method: 'GET'|'POST'| 'PUT' ,id:string,key:string) => {
+export const generateHeader = (url:string, method: 'GET'|'POST'| 'DELETE' ,id:string,key:string) => {
 
 	var data: string = `id=${id}&host=${host}&url=${url}&method=${method}`;
 	var timestamp: string = (new Date().getTime()).toString();

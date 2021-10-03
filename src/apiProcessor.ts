@@ -1,6 +1,7 @@
 import axios , {AxiosResponse} from "axios";
 import { generateHeader, getHost } from "./auth";
 import { VeracodeApplicationResponseData, VeracodeSandboxesResponseData } from "./VeracodeResponse";
+import * as core from '@actions/core'
 
 export class SandboxAPIProcessor {
 
@@ -13,7 +14,7 @@ export class SandboxAPIProcessor {
         }
     }
 
-    private async getAppGUIDbyName(appName: string) {
+    private async getAppGUIDbyNameAPI(appName: string) {
 
         const encodedAppname = encodeURIComponent(appName);
         let path = "/appsec/v1/applications?size=100&page=0&name="+encodedAppname;
@@ -38,11 +39,12 @@ export class SandboxAPIProcessor {
             }
         }
         catch (e) {
-            console.log(e)
+            console.log(e);
+            core.setFailed(e as Error);
         }
     }
 
-    private async getApplicationSandboxes() {
+    private async getApplicationSandboxesAPI() {
 
         let path= `/appsec/v1/applications/${this.appGUID}/sandboxes`;
         
@@ -60,18 +62,60 @@ export class SandboxAPIProcessor {
             }
         }
         catch (e) {
-            console.log(e)
+            console.log(e);
+            core.setFailed(e as Error);
         }
         return [];
     }
 
-    public async getApplicationSandboxCount(appName: string) {
-        await this.getAppGUIDbyName(appName);
+    private async deleteApplicationSandboxesAPI(sandboxGUID:string) {
+
+        let path= `/appsec/v1/applications/${this.appGUID}/sandboxes/${sandboxGUID}`;
+        
+        //send request
+        try {
+            const sandboxesResponse: AxiosResponse = await axios.delete(`https://${getHost()}${path}`,{
+                headers:{
+                    'Authorization': generateHeader(path, 'DELETE',this.apiKey!,this.apiSecret!),
+                },
+            });
+
+            let sandboxes: VeracodeSandboxesResponseData=sandboxesResponse.data;
+            if (sandboxes._embedded.sandboxes){
+                return sandboxes._embedded.sandboxes;
+            }
+        }
+        catch (e) {
+            console.log(e);
+            core.setFailed(e as Error);
+        }
+        return [];
+    }
+
+    private async getApplicationSandboxes(appName:string) {
+        await this.getAppGUIDbyNameAPI(appName);
         if (this.appGUID===0) {
             throw new Error(`Cannot find application with name ${appName}`); 
         }
-        const sandboxes = await this.getApplicationSandboxes();
+        return this.getApplicationSandboxesAPI();
+    }
+
+    public async getApplicationSandboxCount(appName: string) {
+        
+        const sandboxes = await this.getApplicationSandboxes(appName);
 
         return sandboxes.length;
+    }
+
+    public async deleteApplicationSandbox(appName: string,sandboxName:string) {
+        const sandboxes = await this.getApplicationSandboxes(appName);
+
+        const neededSandbox = sandboxes.filter((sandbox) => {
+            return sandbox.name===sandboxName;
+        });
+
+        if (neededSandbox.length>0) {
+            await this.deleteApplicationSandboxesAPI(neededSandbox[0].guid);
+        }
     }
 }
