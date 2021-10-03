@@ -11,7 +11,7 @@ jobs:
       - name: Test Sandbox Cleaning
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
-          VERACODE_API_SECRET: '${{ secrets.VERACODE_API_KEY }}'
+          VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
         uses: ./
         with:
           activity: "remove-sandbox"
