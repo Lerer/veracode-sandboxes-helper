@@ -15,5 +15,6 @@ jobs:
         uses: ./
         with:
           activity: "remove-sandbox"
-          app-name: "My Application"
+          app-name: "Verademo-Brances"
+          sandbox-name: "test-01"
           clean-amount: "2" # (Optional) Number - with default as 1
