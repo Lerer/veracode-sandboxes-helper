@@ -44,7 +44,7 @@ export class SandboxAPIProcessor {
 
     private async getApplicationSandboxes() {
 
-        let path= `/appsec/v2/applications${this.appGUID}/sandboxes`;
+        let path= `/appsec/v2/applications/${this.appGUID}/sandboxes`;
         
         //send request
         try {

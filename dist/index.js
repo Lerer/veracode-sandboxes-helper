@@ -4659,7 +4659,7 @@ class SandboxAPIProcessor {
     }
     getApplicationSandboxes() {
         return __awaiter(this, void 0, void 0, function* () {
-            let path = `/appsec/v2/applications${this.appGUID}/sandboxes`;
+            let path = `/appsec/v2/applications/${this.appGUID}/sandboxes`;
             //send request
             try {
                 const sandboxesResponse = yield axios_1.default.get(`https://${(0, auth_1.getHost)()}${path}`, {
