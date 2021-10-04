@@ -4585,7 +4585,8 @@ try {
         appName: core.getInput('app-name', { required: true }),
         sandboxName: core.getInput('sandbox-name', { trimWhitespace: true }),
         cleanAmount: Number.parseInt(core.getInput('clean-amount')),
-        deleteOnPromote: core.getBooleanInput('delete-on-promote') || false
+        deleteOnPromote: core.getBooleanInput('delete-on-promote') || false,
+        cleanModifiedBefore: parseInt(core.getInput('clean-modified-before', { trimWhitespace: true }) || '0')
     };
     if (o.activity !== 'clean' && o.sandboxName.length === 0) {
         let message = `Need Sandbox name to execute action: ${o.activity}`;
@@ -4788,6 +4789,20 @@ class SandboxAPIProcessor {
             }
         });
     }
+    cleanSandboxes(appName, sandboxesAmount, modifiedBefore) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sandboxes = yield this.getApplicationSandboxes(appName);
+            const filteredSandboxes = sandboxes.filter((sandbox) => {
+                return (sandbox.modified < modifiedBefore.toISOString());
+            }).sort((sandboxA, sandboxB) => {
+                return ((sandboxA.modified < sandboxB.modified) ? 1 : -1);
+            });
+            filteredSandboxes.forEach((sandbox, i) => {
+                console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
+            });
+            return [];
+        });
+    }
 }
 exports.SandboxAPIProcessor = SandboxAPIProcessor;
 
@@ -4870,9 +4885,11 @@ function run(opt, msgFunc) {
     const appName = opt.appName;
     const sandboxName = opt.sandboxName;
     const amount = opt.cleanAmount;
+    const modifiedBefore = new Date();
+    modifiedBefore.setDate(modifiedBefore.getDate() - opt.cleanModifiedBefore);
     switch (action) {
         case 'clean':
-            cleanSandboxes(appName, amount, msgFunc);
+            cleanSandboxes(appName, amount, modifiedBefore, msgFunc);
             break;
         case 'promote-latest-scan':
             promoteScan(appName, sandboxName, opt.deleteOnPromote, msgFunc);
@@ -4914,9 +4931,22 @@ const removeSandbox = (appName, sandboxName, msgFunc) => __awaiter(void 0, void 
     }
     msgFunc('Finish call');
 });
-const cleanSandboxes = (appName, sandboxesAmount, msgFunc) => {
+const cleanSandboxes = (appName, sandboxesAmount, modifiedBefore, msgFunc) => __awaiter(void 0, void 0, void 0, function* () {
     msgFunc(`Got clean activity of ${sandboxesAmount} sandboxes`);
-};
+    try {
+        const apiWrapper = new apiProcessor_1.SandboxAPIProcessor();
+        if (apiWrapper) {
+            const sandboxes = yield apiWrapper.cleanSandboxes(appName, sandboxesAmount, modifiedBefore);
+            msgFunc(`${sandboxes.length} removesd`);
+            msgFunc(`${sandboxes}`);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        core_1.default.setFailed(error);
+    }
+    msgFunc('Finish call');
+});
 
 
 /***/ }),

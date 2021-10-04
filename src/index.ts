@@ -6,10 +6,12 @@ export function run(opt: Options, msgFunc: (msg: string) => void) {
     const appName = opt.appName;
     const sandboxName = opt.sandboxName;
     const amount = opt.cleanAmount;
+    const modifiedBefore = new Date();
+    modifiedBefore.setDate(modifiedBefore.getDate() -  opt.cleanModifiedBefore);
 
     switch (action) {
         case 'clean':
-            cleanSandboxes(appName,amount,msgFunc);
+            cleanSandboxes(appName,amount,modifiedBefore,msgFunc);
             break;
         case 'promote-latest-scan':
             promoteScan(appName,sandboxName,opt.deleteOnPromote,msgFunc);
@@ -51,6 +53,18 @@ const removeSandbox = async (appName: string,sandboxName: string, msgFunc: (msg:
     msgFunc('Finish call');
 }
 
-const cleanSandboxes = (appName: string,sandboxesAmount:number,msgFunc: (msg: string) => void) => {
+const cleanSandboxes = async (appName: string,sandboxesAmount:number,modifiedBefore: Date,msgFunc: (msg: string) => void) => {
     msgFunc(`Got clean activity of ${sandboxesAmount} sandboxes`);
+    try {
+        const apiWrapper = new SandboxAPIProcessor();
+        if (apiWrapper) {
+            const sandboxes = await apiWrapper.cleanSandboxes(appName,sandboxesAmount,modifiedBefore);
+            msgFunc(`${sandboxes.length} removesd`);
+            msgFunc(`${sandboxes}`);
+        }
+    } catch (error) {
+        console.log(error);
+        core.setFailed(error as Error);
+    }
+    msgFunc('Finish call');
 }

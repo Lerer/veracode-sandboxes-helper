@@ -3,5 +3,6 @@ export interface Options {
     appName: string,
     sandboxName: string,
     cleanAmount: number,
-    deleteOnPromote: boolean
+    deleteOnPromote: boolean,
+    cleanModifiedBefore: number
 }

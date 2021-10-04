@@ -22,6 +22,10 @@ inputs:
     description: 'Deletes the sandbox after its promotion. Only works with the [promote] activity. Default is false'
     required: false
     default: 'false'
+  clean-modified-before:
+    description: 'The number of days which the sandbox had no activity'
+    required: false
+    default: "0"
 runs:
   using: 'node12'
   main: 'dist/index.js'

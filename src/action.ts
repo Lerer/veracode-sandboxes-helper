@@ -10,8 +10,9 @@ try {
         appName: core.getInput('app-name', {required: true}),
         sandboxName: core.getInput('sandbox-name',{trimWhitespace:true}),
         cleanAmount: Number.parseInt(core.getInput('clean-amount')),
-        deleteOnPromote: core.getBooleanInput('delete-on-promote') || false
-    } 
+        deleteOnPromote: core.getBooleanInput('delete-on-promote') || false,
+        cleanModifiedBefore: parseInt(core.getInput('clean-modified-before',{trimWhitespace:true}) || '0')
+    };
 
     if (o.activity !== 'clean' && o.sandboxName.length===0) {
         let message = `Need Sandbox name to execute action: ${o.activity}`;
