@@ -1,4 +1,9 @@
-on: [push,workflow_dispatch]
+on: 
+  push:
+    paths-ignore:
+      - "README.md"
+      - "**.json"
+  workflow_dispatch:
 
 jobs:
   veracode-sandbox-task:
@@ -17,5 +22,5 @@ jobs:
           activity: "promote-latest-scan"
           app-name: "Verademo-Brances"
           sandbox-name: "test-01"
-          delete-on-promote: false
-          clean-amount: "2" # (Optional) Number - with default as 1
+          delete-on-promote: true
+          # clean-amount: "2" # (Optional) Number - with default as 1
