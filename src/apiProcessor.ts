@@ -92,7 +92,11 @@ export class SandboxAPIProcessor {
     }
 
     private async promoteApplicationSandboxesAPI(sandboxGUID:string, deleteOnPromote:boolean) {
-        let path= `/appsec/v1/applications/${this.appGUID}/sandboxes/${sandboxGUID}/promote?delete_on_promote=${deleteOnPromote}`;
+        let path= `/appsec/v1/applications/${this.appGUID}/sandboxes/${sandboxGUID}/promote`;
+        
+        if (deleteOnPromote) {
+            path += `?delete_on_promote=${deleteOnPromote}`;
+        }
         
         try {
             const sandboxesResponse: AxiosResponse = await axios.post(`https://${getHost()}${path}`,{

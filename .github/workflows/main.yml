@@ -17,5 +17,5 @@ jobs:
           activity: "promote-latest-scan"
           app-name: "Verademo-Brances"
           sandbox-name: "test-01"
-          delete-on-promote: true
+          delete-on-promote: false
           clean-amount: "2" # (Optional) Number - with default as 1
