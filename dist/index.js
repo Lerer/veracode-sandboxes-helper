@@ -4724,10 +4724,7 @@ class SandboxAPIProcessor {
     }
     promoteApplicationSandboxesAPI(sandboxGUID, deleteOnPromote) {
         return __awaiter(this, void 0, void 0, function* () {
-            let path = `/appsec/v1/applications/${this.appGUID}/sandboxes/${sandboxGUID}/promote`;
-            if (deleteOnPromote) {
-                path = path + '?delete_on_promote=true';
-            }
+            let path = `/appsec/v1/applications/${this.appGUID}/sandboxes/${sandboxGUID}/promote?delete_on_promote=${deleteOnPromote}`;
             try {
                 const sandboxesResponse = yield axios_1.default.post(`https://${(0, auth_1.getHost)()}${path}`, {
                     headers: {
