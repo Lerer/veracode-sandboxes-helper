@@ -4692,6 +4692,7 @@ class SandboxAPIProcessor {
                 });
                 let sandboxes = sandboxesResponse.data;
                 if (sandboxes._embedded.sandboxes) {
+                    console.log(sandboxes._embedded.sandboxes);
                     return sandboxes._embedded.sandboxes;
                 }
             }

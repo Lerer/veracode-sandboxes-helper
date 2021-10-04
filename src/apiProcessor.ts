@@ -58,6 +58,7 @@ export class SandboxAPIProcessor {
 
             let sandboxes: VeracodeSandboxesResponseData=sandboxesResponse.data;
             if (sandboxes._embedded.sandboxes){
+                console.log(sandboxes._embedded.sandboxes);
                 return sandboxes._embedded.sandboxes;
             }
         }
