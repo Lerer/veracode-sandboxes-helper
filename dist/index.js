@@ -4729,7 +4729,8 @@ class SandboxAPIProcessor {
                 path += `?delete_on_promote=${deleteOnPromote}`;
             }
             try {
-                const sandboxesResponse = yield axios_1.default.post(`https://${(0, auth_1.getHost)()}${path}`, {
+                const sandboxesResponse = yield axios_1.default.post(`https://${(0, auth_1.getHost)()}${path}`, {}, // Body
+                {
                     headers: {
                         'Authorization': (0, auth_1.generateHeader)(path, 'POST', this.apiKey, this.apiSecret),
                     },

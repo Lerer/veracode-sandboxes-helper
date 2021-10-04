@@ -99,7 +99,9 @@ export class SandboxAPIProcessor {
         }
         
         try {
-            const sandboxesResponse: AxiosResponse = await axios.post(`https://${getHost()}${path}`,{
+            const sandboxesResponse: AxiosResponse = await axios.post(`https://${getHost()}${path}`,
+            {}, // Body
+            { // config
                 headers:{
                     'Authorization': generateHeader(path, 'POST',this.apiKey!,this.apiSecret!),
                 },
