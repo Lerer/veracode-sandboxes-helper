@@ -169,7 +169,9 @@ export class SandboxAPIProcessor {
         let filteredSandboxes = sandboxes.filter((sandbox) => {
             return (sandbox.modified<modifiedBefore.toISOString());
         }).sort((sandboxA,sandboxB) => {
-            return ((sandboxA.modified > sandboxB.modified)? 1 : -1)
+            let retVal = sandboxA.modified > sandboxB.modified ;
+            console.log(`sandboxA.modified [${sandboxA.modified}] > sandboxB.modified [${sandboxB.modified}] => ${retVal}`)
+            return (retVal ? 1 : -1);
         });
 
         filteredSandboxes.forEach((sandbox,i) => {
