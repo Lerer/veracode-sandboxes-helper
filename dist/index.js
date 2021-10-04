@@ -4792,11 +4792,21 @@ class SandboxAPIProcessor {
     cleanSandboxes(appName, sandboxesAmount, modifiedBefore) {
         return __awaiter(this, void 0, void 0, function* () {
             const sandboxes = yield this.getApplicationSandboxes(appName);
-            const filteredSandboxes = sandboxes.filter((sandbox) => {
+            let filteredSandboxes = sandboxes.filter((sandbox) => {
                 return (sandbox.modified < modifiedBefore.toISOString());
             }).sort((sandboxA, sandboxB) => {
-                return ((sandboxA.modified < sandboxB.modified) ? 1 : -1);
+                let retVal = sandboxA.modified > sandboxB.modified;
+                console.log(`sandboxA.modified [${sandboxA.modified}] > sandboxB.modified [${sandboxB.modified}] => ${retVal}`);
+                return (retVal ? 1 : -1);
             });
+            filteredSandboxes.forEach((sandbox, i) => {
+                console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
+            });
+            if (sandboxesAmount < 1) {
+                sandboxesAmount = 1;
+            }
+            filteredSandboxes = filteredSandboxes.slice(0, sandboxesAmount - 1);
+            console.log('================');
             filteredSandboxes.forEach((sandbox, i) => {
                 console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
             });
