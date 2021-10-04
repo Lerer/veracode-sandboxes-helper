@@ -18,4 +18,5 @@ jobs:
           activity: "clean"
           app-name: "Verademo-Brances"
           clean-amount: "2" 
+          clean-modified-before: "0"
           

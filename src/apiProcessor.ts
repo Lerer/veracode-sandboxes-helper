@@ -166,15 +166,26 @@ export class SandboxAPIProcessor {
     public async cleanSandboxes(appName:string, sandboxesAmount:number,modifiedBefore: Date) {
         const sandboxes = await this.getApplicationSandboxes(appName);
 
-        const filteredSandboxes = sandboxes.filter((sandbox) => {
+        let filteredSandboxes = sandboxes.filter((sandbox) => {
             return (sandbox.modified<modifiedBefore.toISOString());
         }).sort((sandboxA,sandboxB) => {
-            return ((sandboxA.modified < sandboxB.modified)? 1 : -1)
+            return ((sandboxA.modified > sandboxB.modified)? 1 : -1)
         });
 
         filteredSandboxes.forEach((sandbox,i) => {
             console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
         });
+
+        if (sandboxesAmount<1) {
+            sandboxesAmount = 1;
+        }
+
+        filteredSandboxes = filteredSandboxes.slice(0,sandboxesAmount-1);
+        console.log('================');
+        filteredSandboxes.forEach((sandbox,i) => {
+            console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
+        });
+
 
         return [];
     }
