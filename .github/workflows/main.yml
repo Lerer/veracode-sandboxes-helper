@@ -3,6 +3,7 @@ on:
     paths-ignore:
       - "README.md"
       - "**.json"
+      - "action.yml"
   workflow_dispatch:
 
 jobs:

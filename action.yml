@@ -1,6 +1,9 @@
 # action.yml
 name: 'Veracode Application Sandboxes Helper'
 description: 'A set of actions and activities to manage sandboxes in the context of a workflow processes'
+branding:
+  icon: 'play'
+  color: 'blue'
 inputs:
   activity:
     description: "The activity expected from the Action: clean, promote-latest-scan, promote-and-remove, remove-sandbox"
