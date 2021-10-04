@@ -9,7 +9,8 @@ try {
         activity: core.getInput('activity', {required: true}) as Options['activity'],
         appName: core.getInput('app-name', {required: true}),
         sandboxName: core.getInput('sandbox-name',{trimWhitespace:true}),
-        cleanAmount: Number.parseInt(core.getInput('clean-amount'))
+        cleanAmount: Number.parseInt(core.getInput('clean-amount')),
+        deleteOnPromote: core.getBooleanInput('delete-on-promote') || false
     } 
 
     if (o.activity !== 'clean' && o.sandboxName.length===0) {

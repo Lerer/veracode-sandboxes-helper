@@ -11,15 +11,11 @@ export function run(opt: Options, msgFunc: (msg: string) => void) {
         case 'clean':
             cleanSandboxes(appName,amount,msgFunc);
             break;
-        case 'promote-and-remove':
-            promoteScan(appName,sandboxName,true,msgFunc);
+        case 'promote-latest-scan':
+            promoteScan(appName,sandboxName,opt.deleteOnPromote,msgFunc);
             break;
         case 'remove-sandbox':
             removeSandbox(appName,sandboxName,msgFunc);
-            break;
-        case 'promote-latest-scan':
-            promoteScan(appName,sandboxName,false,msgFunc);
-            break;
     }
 }
 

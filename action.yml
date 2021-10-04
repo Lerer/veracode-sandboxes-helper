@@ -15,6 +15,10 @@ inputs:
     description: 'The amount of oldest scanned-in sandboxes to remove'
     required: false
     default: "1"
+  delete-on-promote:
+    description: 'Deletes the sandbox after its promotion. Only works with the [promote] activity. Default is false'
+    required: false
+    default: 'false'
 runs:
   using: 'node12'
   main: 'dist/index.js'

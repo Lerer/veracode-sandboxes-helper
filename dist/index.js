@@ -4584,7 +4584,8 @@ try {
         activity: core.getInput('activity', { required: true }),
         appName: core.getInput('app-name', { required: true }),
         sandboxName: core.getInput('sandbox-name', { trimWhitespace: true }),
-        cleanAmount: Number.parseInt(core.getInput('clean-amount'))
+        cleanAmount: Number.parseInt(core.getInput('clean-amount')),
+        deleteOnPromote: core.getBooleanInput('delete-on-promote') || false
     };
     if (o.activity !== 'clean' && o.sandboxName.length === 0) {
         let message = `Need Sandbox name to execute action: ${o.activity}`;
@@ -4872,15 +4873,11 @@ function run(opt, msgFunc) {
         case 'clean':
             cleanSandboxes(appName, amount, msgFunc);
             break;
-        case 'promote-and-remove':
-            promoteScan(appName, sandboxName, true, msgFunc);
+        case 'promote-latest-scan':
+            promoteScan(appName, sandboxName, opt.deleteOnPromote, msgFunc);
             break;
         case 'remove-sandbox':
             removeSandbox(appName, sandboxName, msgFunc);
-            break;
-        case 'promote-latest-scan':
-            promoteScan(appName, sandboxName, false, msgFunc);
-            break;
     }
 }
 exports.run = run;
