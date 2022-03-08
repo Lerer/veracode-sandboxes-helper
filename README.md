@@ -67,7 +67,7 @@ on:
 jobs:
   veracode-sandbox-task:
     runs-on: ubuntu-latest
-    name: Clean 2 Sandboxes
+    name: Clean branch Sandbox
 
     steps:
 
@@ -77,11 +77,13 @@ jobs:
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
-        uses: lerer/veracode-sandboxes-helper@v1
+        uses: lerer/veracode-sandboxes-helper@v1.0.1
         with:
           activity: "remove-sandbox"
           app-name: "<YOUR VERACODE APPLICATION NAME>"
-          sandbox-name: "<SANDBOX_NAME>" # "${{ github.ref }}"
+          # "${{ github.ref }}" - current branch on push triggers
+          # or "${{ github.event.pull_request.head.ref }}" - post pull request
+          sandbox-name: "<SANDBOX_NAME>" 
       
 ```
 
@@ -108,11 +110,10 @@ jobs:
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
-        uses: lerer/veracode-sandboxes-helper@v1
+        uses: lerer/veracode-sandboxes-helper@v1.0.1
         with:
           activity: "clean"
           app-name: "<YOUR VERACODE APPLICATION NAME>"
-          sandbox-name: "<SANDBOX_NAME>" # "${{ github.event.pull_request.head.ref }}"
           clean-amount: "2"
           clean-modified-before: "14" 
       
@@ -144,7 +145,7 @@ jobs:
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
-        uses: lerer/veracode-sandboxes-helper@v1 
+        uses: lerer/veracode-sandboxes-helper@v1.0.1 
         with:
           activity: "promote-latest-scan"
           app-name: "<YOUR VERACODE APPLICATION NAME>"

@@ -1,6 +1,6 @@
 {
   "name": "veracode-sandboxes-helper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An Action to handle Sandboxes such as, deleting, promoting scans, and with combination",
   "main": "./dist/index.js",
   "scripts": {
