@@ -81,8 +81,7 @@ export class SandboxAPIProcessor {
                     'Authorization': generateHeader(path, 'DELETE',this.apiKey!,this.apiSecret!),
                 },
             });
-            console.log('post delete api call');
-            console.log(sandboxesResponse.data);
+
             let sandbox: VeracodeSandboxData=sandboxesResponse.data;
             if (sandbox.id){
                 return sandbox;
@@ -193,10 +192,8 @@ export class SandboxAPIProcessor {
         const deletedGUIDs: string[] = [];
         await Promise.all(filteredSandboxes.map(async (sandbox,i) => {
             core.info(`[${i}] - ${sandbox.name} => ${sandbox.modified}, ${sandbox.guid}`);
-            const deleted = await this.deleteApplicationSandboxesAPI(sandbox.guid);
-            console.log(deleted);
-            core.info(`Sandbox '${deleted?.name ? deleted?.name : 'N/A'}' with GUID [${sandbox.guid}] deleted`);
-            core.info(deleted?.name ? deleted?.name : 'N/A');
+            await this.deleteApplicationSandboxesAPI(sandbox.guid);
+            core.info(`Sandbox '${sandbox.name}' with GUID [${sandbox.guid}] deleted`);
             deletedGUIDs.push(`'${sandbox.name}' (GUID:${sandbox.guid})`);
         }));
         core.info('---------------------------------');

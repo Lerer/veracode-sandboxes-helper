@@ -4750,8 +4750,6 @@ class SandboxAPIProcessor {
                         'Authorization': (0, auth_1.generateHeader)(path, 'DELETE', this.apiKey, this.apiSecret),
                     },
                 });
-                console.log('post delete api call');
-                console.log(sandboxesResponse.data);
                 let sandbox = sandboxesResponse.data;
                 if (sandbox.id) {
                     return sandbox;
@@ -4853,10 +4851,8 @@ class SandboxAPIProcessor {
             const deletedGUIDs = [];
             yield Promise.all(filteredSandboxes.map((sandbox, i) => __awaiter(this, void 0, void 0, function* () {
                 core.info(`[${i}] - ${sandbox.name} => ${sandbox.modified}, ${sandbox.guid}`);
-                const deleted = yield this.deleteApplicationSandboxesAPI(sandbox.guid);
-                console.log(deleted);
-                core.info(`Sandbox '${(deleted === null || deleted === void 0 ? void 0 : deleted.name) ? deleted === null || deleted === void 0 ? void 0 : deleted.name : 'N/A'}' with GUID [${sandbox.guid}] deleted`);
-                core.info((deleted === null || deleted === void 0 ? void 0 : deleted.name) ? deleted === null || deleted === void 0 ? void 0 : deleted.name : 'N/A');
+                yield this.deleteApplicationSandboxesAPI(sandbox.guid);
+                core.info(`Sandbox '${sandbox.name}' with GUID [${sandbox.guid}] deleted`);
                 deletedGUIDs.push(`'${sandbox.name}' (GUID:${sandbox.guid})`);
             })));
             core.info('---------------------------------');
