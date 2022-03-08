@@ -4750,6 +4750,8 @@ class SandboxAPIProcessor {
                         'Authorization': (0, auth_1.generateHeader)(path, 'DELETE', this.apiKey, this.apiSecret),
                     },
                 });
+                console.log('post delete api call');
+                console.log(sandboxesResponse.data);
                 let sandbox = sandboxesResponse.data;
                 if (sandbox.id) {
                     return sandbox;
@@ -4995,7 +4997,7 @@ const cleanSandboxes = (appName, sandboxesAmount, modifiedBefore, msgFunc) => __
         const apiWrapper = new apiProcessor_1.SandboxAPIProcessor();
         if (apiWrapper) {
             const sandboxes = yield apiWrapper.cleanSandboxes(appName, sandboxesAmount, modifiedBefore);
-            msgFunc(`${sandboxes.length} removesd`);
+            msgFunc(`${sandboxes.length} sandboxes removesd:`);
             msgFunc(`${sandboxes}`);
         }
     }
@@ -5003,7 +5005,7 @@ const cleanSandboxes = (appName, sandboxesAmount, modifiedBefore, msgFunc) => __
         console.log(error);
         core_1.default.setFailed(error);
     }
-    msgFunc('Finish call');
+    msgFunc('End Action');
 });
 
 

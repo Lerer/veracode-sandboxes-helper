@@ -81,7 +81,8 @@ export class SandboxAPIProcessor {
                     'Authorization': generateHeader(path, 'DELETE',this.apiKey!,this.apiSecret!),
                 },
             });
-
+            console.log('post delete api call');
+            console.log(sandboxesResponse.data);
             let sandbox: VeracodeSandboxData=sandboxesResponse.data;
             if (sandbox.id){
                 return sandbox;

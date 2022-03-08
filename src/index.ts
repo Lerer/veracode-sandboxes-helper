@@ -59,12 +59,12 @@ const cleanSandboxes = async (appName: string,sandboxesAmount:number,modifiedBef
         const apiWrapper = new SandboxAPIProcessor();
         if (apiWrapper) {
             const sandboxes = await apiWrapper.cleanSandboxes(appName,sandboxesAmount,modifiedBefore);
-            msgFunc(`${sandboxes.length} removesd`);
+            msgFunc(`${sandboxes.length} sandboxes removesd:`);
             msgFunc(`${sandboxes}`);
         }
     } catch (error) {
         console.log(error);
         core.setFailed(error as Error);
     }
-    msgFunc('Finish call');
+    msgFunc('End Action');
 }
