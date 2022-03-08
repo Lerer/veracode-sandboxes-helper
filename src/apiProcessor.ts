@@ -190,14 +190,14 @@ export class SandboxAPIProcessor {
         core.info('=================================');
 
         const deletedGUIDs: string[] = [];
-        filteredSandboxes.forEach(async (sandbox,i) =>  {
+        await Promise.all(filteredSandboxes.map(async (sandbox,i) => {
             core.info(`[${i}] - ${sandbox.name} => ${sandbox.modified}, ${sandbox.guid}`);
             const deleted = await this.deleteApplicationSandboxesAPI(sandbox.guid);
             console.log(deleted);
             core.info(`Sandbox '${deleted?.name ? deleted?.name : 'N/A'}' with GUID [${sandbox.guid}] deleted`);
             core.info(deleted?.name ? deleted?.name : 'N/A');
             deletedGUIDs.push(`'${sandbox.name}' (GUID:${sandbox.guid})`);
-        });
+        }));
         core.info('---------------------------------');
 
         return deletedGUIDs;

@@ -16,7 +16,7 @@ jobs:
         uses: ./
         with:
           activity: "clean"
-          app-name: "Verademo-Brances"
+          app-name: "test-delete-sandboxes"
           clean-amount: "2" 
           clean-modified-before: "600"
       - name: Test Sandbox Cleaning - single sandbox
@@ -26,8 +26,7 @@ jobs:
         uses: ./
         with:
           activity: "clean"
-          app-name: "Verademo-Brances"
+          app-name: "test-delete-sandboxes"
           clean-amount: "1" 
-          clean-modified-before: "120"
       
           

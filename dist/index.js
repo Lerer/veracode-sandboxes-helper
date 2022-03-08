@@ -4849,14 +4849,14 @@ class SandboxAPIProcessor {
             core.info('Deleting the following sandboxes:');
             core.info('=================================');
             const deletedGUIDs = [];
-            filteredSandboxes.forEach((sandbox, i) => __awaiter(this, void 0, void 0, function* () {
+            yield Promise.all(filteredSandboxes.map((sandbox, i) => __awaiter(this, void 0, void 0, function* () {
                 core.info(`[${i}] - ${sandbox.name} => ${sandbox.modified}, ${sandbox.guid}`);
                 const deleted = yield this.deleteApplicationSandboxesAPI(sandbox.guid);
                 console.log(deleted);
                 core.info(`Sandbox '${(deleted === null || deleted === void 0 ? void 0 : deleted.name) ? deleted === null || deleted === void 0 ? void 0 : deleted.name : 'N/A'}' with GUID [${sandbox.guid}] deleted`);
                 core.info((deleted === null || deleted === void 0 ? void 0 : deleted.name) ? deleted === null || deleted === void 0 ? void 0 : deleted.name : 'N/A');
                 deletedGUIDs.push(`'${sandbox.name}' (GUID:${sandbox.guid})`);
-            }));
+            })));
             core.info('---------------------------------');
             return deletedGUIDs;
         });
