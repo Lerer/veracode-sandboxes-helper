@@ -29,7 +29,7 @@ Value | Details
 **Required** - The sandbox name
 
 ### `delete-on-promote`
-**Optional** - Only works with `promote-latest-scan` activity and give you the option to specify if you want the Sandbox to be deleted after the last scan is promoted to a Policy Scan
+**Optional** - Only works with `activity: "promote-latest-scan"` activity and give you the option to specify if you want the Sandbox to be deleted after the last scan is promoted to a Policy Scan
 
 | Value |  Details|
 --- | ---
@@ -76,7 +76,7 @@ jobs:
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
-        uses: lerer/veracode-sandboxes-helper@v1.1.0 
+        uses: lerer/veracode-sandboxes-helper@v1
         with:
           activity: "remove-sandbox"
           app-name: "<YOUR VERACODE APPLICATION NAME>"
@@ -107,7 +107,7 @@ jobs:
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
-        uses: lerer/veracode-sandboxes-helper@v1.1.0 
+        uses: lerer/veracode-sandboxes-helper@v1
         with:
           activity: "clean"
           app-name: "<YOUR VERACODE APPLICATION NAME>"
@@ -143,7 +143,7 @@ jobs:
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
-        uses: lerer/veracode-sandboxes-helper@v1.1.0 
+        uses: lerer/veracode-sandboxes-helper@v1 
         with:
           activity: "promote-latest-scan"
           app-name: "<YOUR VERACODE APPLICATION NAME>"

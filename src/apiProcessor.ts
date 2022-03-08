@@ -184,7 +184,7 @@ export class SandboxAPIProcessor {
             sandboxesAmount = 1;
         }
 
-        filteredSandboxes = filteredSandboxes.slice(0,sandboxesAmount-1);
+        filteredSandboxes = filteredSandboxes.slice(0,sandboxesAmount);
         console.log('================');
         filteredSandboxes.forEach((sandbox,i) => {
             console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);

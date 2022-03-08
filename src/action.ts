@@ -16,7 +16,7 @@ try {
 
     if (o.activity !== 'clean' && o.sandboxName.length===0) {
         let message = `Need Sandbox name to execute action: ${o.activity}`;
-        core.info(message);
+        core.error(message);
         throw new Error(message);
     }
 
