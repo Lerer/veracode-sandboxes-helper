@@ -9,7 +9,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Test Sandbox Cleaning
+      - name: Test Sandbox Cleaning - no sandbox
+        env:
+          VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
+          VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
+        uses: ./
+        with:
+          activity: "clean"
+          app-name: "Verademo-Brances"
+          clean-amount: "2" 
+          clean-modified-before: "600"
+      - name: Test Sandbox Cleaning - single sandbox
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
@@ -19,4 +29,5 @@ jobs:
           app-name: "Verademo-Brances"
           clean-amount: "1" 
           clean-modified-before: "120"
+      
           
