@@ -45,7 +45,8 @@ Value | Details
 | Any number from 1-25 | Number of sandboxes to delete |
 
 ### `clean-modified-before`
-**Optional** - Another attribute which can work in parallel with `clean-amount` when the activity is `clean`. The attribute will instruct the clean step to only look for sandboxes which their `modified` date is older than the amount of days given as the a value.
+**Optional** - The attribute will instruct the clean step to only look for sandboxes which their `modified` date is older than the amount of days given as the a value. 
+:exclamation: __Only works in conjunction with the `clean` activity__
 
 Value |  Details|
 --- | ---

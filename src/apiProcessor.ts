@@ -28,7 +28,7 @@ export class SandboxAPIProcessor {
             });
 
             let apps: VeracodeApplicationResponseData=applicationsListResponse.data;
-            if (apps._embedded.applications){
+            if (apps._embedded && apps._embedded.applications){
                 console.log(`${apps._embedded.applications.length} apps found matching the name`);
                 let selectedApps = apps._embedded.applications.filter((appObj) => {
                     return appObj.profile.name === appName;
@@ -172,24 +172,30 @@ export class SandboxAPIProcessor {
             return (sandbox.modified<modifiedBefore.toISOString());
         }).sort((sandboxA,sandboxB) => {
             let retVal = sandboxA.modified > sandboxB.modified ;
-            console.log(`sandboxA.modified [${sandboxA.modified}] > sandboxB.modified [${sandboxB.modified}] => ${retVal}`)
             return (retVal ? 1 : -1);
         });
 
+        core.info('Sandboxs from oldest to newest:');
+        core.info('===============================');
         filteredSandboxes.forEach((sandbox,i) => {
             console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
         });
-
+        core.info('-------------------------------');
         if (sandboxesAmount<1) {
             sandboxesAmount = 1;
         }
 
         filteredSandboxes = filteredSandboxes.slice(0,sandboxesAmount);
-        console.log('================');
-        filteredSandboxes.forEach((sandbox,i) => {
-            console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
-        });
+        core.info('Deleting the following sandboxes:');
+        core.info('=================================');
 
+        filteredSandboxes.forEach(async (sandbox,i) =>  {
+            core.info(`[${i}] - ${sandbox.name} => ${sandbox.modified}, ${sandbox.guid}`);
+            // const deleted = await this.deleteApplicationSandboxesAPI(sandbox.guid);
+            // core.info(`Sandbox ${sandbox.guid} deleted`);
+            // core.info(deleted?.name ? deleted?.name : 'N/A');
+        });
+        core.info('---------------------------------');
 
         return [];
     }

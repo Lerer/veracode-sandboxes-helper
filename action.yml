@@ -6,7 +6,7 @@ branding:
   color: 'blue'
 inputs:
   activity:
-    description: "The activity expected from the Action: clean, promote-latest-scan, promote-and-remove, remove-sandbox"
+    description: "The activity expected from the Action: clean, promote-latest-scan, remove-sandbox"
     required: false
   app-name:  # id of input
     description: 'Veracode Application name'
