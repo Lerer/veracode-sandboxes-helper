@@ -1,9 +1,4 @@
 on: 
-  push:
-    paths-ignore:
-      - "README.md"
-      - "**.json"
-      - "action.yml"
   workflow_dispatch:
 
 jobs:
@@ -14,14 +9,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Test Sandbox Cleaning
+      - name: Test Sandbox Cleaning - no sandbox
         env:
           VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
         uses: ./
         with:
-          activity: "promote-latest-scan"
-          app-name: "Verademo-Brances"
-          sandbox-name: "test-01"
-          delete-on-promote: true
-          # clean-amount: "2" # (Optional) Number - with default as 1
+          activity: "clean"
+          app-name: "test-delete-sandboxes"
+          clean-amount: "2" 
+          clean-modified-before: "600"
+      - name: Test Sandbox Cleaning - single sandbox
+        env:
+          VERACODE_API_ID: '${{ secrets.VERACODE_API_ID }}'
+          VERACODE_API_SECRET: '${{ secrets.VERACODE_API_SECRET }}'
+        uses: ./
+        with:
+          activity: "clean"
+          app-name: "test-delete-sandboxes"
+          clean-amount: "1" 
+      
+          

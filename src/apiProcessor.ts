@@ -28,7 +28,7 @@ export class SandboxAPIProcessor {
             });
 
             let apps: VeracodeApplicationResponseData=applicationsListResponse.data;
-            if (apps._embedded.applications){
+            if (apps._embedded && apps._embedded.applications){
                 console.log(`${apps._embedded.applications.length} apps found matching the name`);
                 let selectedApps = apps._embedded.applications.filter((appObj) => {
                     return appObj.profile.name === appName;
@@ -58,6 +58,8 @@ export class SandboxAPIProcessor {
 
             let sandboxes: VeracodeSandboxesResponseData=sandboxesResponse.data;
             if (sandboxes._embedded.sandboxes){
+                console.log(`https://${getHost()}${path}`);
+                console.log(sandboxes._embedded.sandboxes);
                 return sandboxes._embedded.sandboxes;
             }
         }
@@ -161,5 +163,41 @@ export class SandboxAPIProcessor {
         if (sandbox) {
             return this.promoteApplicationSandboxesAPI(sandbox.guid,deleteOnPromote);
         }
+    }
+
+    public async cleanSandboxes(appName:string, sandboxesAmount:number,modifiedBefore: Date) {
+        const sandboxes = await this.getApplicationSandboxes(appName);
+
+        let filteredSandboxes = sandboxes.filter((sandbox) => {
+            return (sandbox.modified<modifiedBefore.toISOString());
+        }).sort((sandboxA,sandboxB) => {
+            let retVal = sandboxA.modified > sandboxB.modified ;
+            return (retVal ? 1 : -1);
+        });
+
+        core.info('Date match Sandboxes from oldest to newest:');
+        core.info('===========================================');
+        filteredSandboxes.forEach((sandbox,i) => {
+            core.info(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
+        });
+        core.info('-------------------------------------------');
+        if (sandboxesAmount<1) {
+            sandboxesAmount = 1;
+        }
+
+        filteredSandboxes = filteredSandboxes.slice(0,sandboxesAmount);
+        core.info('Deleting the following sandboxes:');
+        core.info('=================================');
+
+        const deletedGUIDs: string[] = [];
+        await Promise.all(filteredSandboxes.map(async (sandbox,i) => {
+            core.info(`[${i}] - ${sandbox.name} => ${sandbox.modified}, ${sandbox.guid}`);
+            await this.deleteApplicationSandboxesAPI(sandbox.guid);
+            core.info(`Sandbox '${sandbox.name}' with GUID [${sandbox.guid}] deleted`);
+            deletedGUIDs.push(`'${sandbox.name}' (GUID:${sandbox.guid})`);
+        }));
+        core.info('---------------------------------');
+
+        return deletedGUIDs;
     }
 }
