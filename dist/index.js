@@ -4836,26 +4836,28 @@ class SandboxAPIProcessor {
                 let retVal = sandboxA.modified > sandboxB.modified;
                 return (retVal ? 1 : -1);
             });
-            core.info('Sandboxs from oldest to newest:');
-            core.info('===============================');
+            core.info('Date match Sandboxs from oldest to newest:');
+            core.info('==========================================');
             filteredSandboxes.forEach((sandbox, i) => {
                 console.log(`[${i}] - ${sandbox.name} => ${sandbox.modified}`);
             });
-            core.info('-------------------------------');
+            core.info('------------------------------------------');
             if (sandboxesAmount < 1) {
                 sandboxesAmount = 1;
             }
             filteredSandboxes = filteredSandboxes.slice(0, sandboxesAmount);
             core.info('Deleting the following sandboxes:');
             core.info('=================================');
+            const deletedGUIDs = [];
             filteredSandboxes.forEach((sandbox, i) => __awaiter(this, void 0, void 0, function* () {
                 core.info(`[${i}] - ${sandbox.name} => ${sandbox.modified}, ${sandbox.guid}`);
                 // const deleted = await this.deleteApplicationSandboxesAPI(sandbox.guid);
                 // core.info(`Sandbox ${sandbox.guid} deleted`);
                 // core.info(deleted?.name ? deleted?.name : 'N/A');
+                deletedGUIDs.push(`'${sandbox.name}' (GUID:${sandbox.guid})`);
             }));
             core.info('---------------------------------');
-            return [];
+            return deletedGUIDs;
         });
     }
 }
